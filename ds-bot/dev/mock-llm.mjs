@@ -19,6 +19,7 @@
 //   建群 名: A, B · 群发[回报] 名: 消息 · 改群 名 公告|管理员|模式|加|踢: 值 · 删群 名
 //   看群 名 (read_group_chat) · 转告 名: 消息, also over several lines (message_bot) · 搜索：查询1 | 查询2 (web_search)
 //   进目录 路径 (working_directory with cd)
+//   套利团队 · 套利模拟 [拒绝] · 套利记录 (synthetic research scenarios only)
 //   插话 名: 消息 (message_bot when "now") · 排队 名: 消息 (message_bot when "queue") · 叫停 名: 原因 (stop_bot)
 //   In a message from a Bot: 转告 名: 消息 (hands it on with message_bot) · 慢慢做 N (answers after N seconds)
 //   长文 N / long N (N×1000 characters) · 长任务 N [K] (N steps of K×1000, default 4)
@@ -124,9 +125,13 @@ function decide(body) {
   }).filter(message => message.role !== 'user' || message.content.length > 0)
   const last = messages.at(-1)
   const blocks = Array.isArray(last?.content) ? last.content : []
-  // An aside (btw.js). The first line is the marker; the reply is fixed and calls nothing.
-  if (last?.role === 'user' && textBlocks(last.content).some(value => value.startsWith('ds-bot/btw\n') || value === 'ds-bot/btw')) {
-    return [text('Based on the conversation so far.')]
+  // A side-chat question (side.js). The first line is the marker; the reply is
+  // fixed and calls nothing. Its count of earlier answers proves follow-ups
+  // carry the chat's finished pairs.
+  if (last?.role === 'user' && textBlocks(last.content).some(value => value.startsWith('ds-bot/side\n') || value === 'ds-bot/side')) {
+    const pairs = messages.filter(message => message.role === 'assistant'
+      && textBlocks(message.content).some(value => value.startsWith('Side note:'))).length
+    return [text(`Side note: ${pairs} earlier pair(s) seen.`)]
   }
   const me = /You are (.+?), a Bot on the user's team/.exec(system)?.[1] ?? 'Bot'
   const isMain = system.includes('You are the Main Bot')
@@ -408,6 +413,17 @@ function decide(body) {
     return [text('这件事要用一个密钥，我先看看有没有。'), tool('request_secret', { name: secretAsk[1] ?? 'DEMO_TOKEN', purpose: '测试' })]
   }
   // Group management in a Bot's own chat, in a fixed command form the tests use.
+  if (userText === '套利团队' && tools.has('setup_arbitrage_team')) return [tool('setup_arbitrage_team', {})]
+  if (userText === '套利记录' && tools.has('list_arbitrage_records')) return [tool('list_arbitrage_records', { limit: 10 })]
+  if (/^套利模拟(?: 拒绝)?$/.test(userText) && tools.has('evaluate_arbitrage')) {
+    const observedAt = new Date(Date.now() - 1000).toISOString()
+    return [tool('evaluate_arbitrage', {
+      dataKind: 'synthetic', chain: 'demo-chain', baseAsset: 'DEMO-BASE', quoteAsset: 'DEMO-QUOTE', baseAmount: 2,
+      buy: { venue: 'Example A', price: 100, depthBase: 3, observedAt, source: 'https://example.org/a' },
+      sell: { venue: 'Example B', price: 103, depthBase: 3, observedAt, source: 'https://example.org/b' },
+      costs: { buyFeeBps: 10, sellFeeBps: 20, buySlippageBps: 5, sellSlippageBps: 5, gasQuote: userText.endsWith('拒绝') ? 5 : 1, otherQuote: 0.5, bufferBps: 10 },
+    })]
+  }
   let order
   if ((order = /^建群\s*(\S+?)\s*[:：]\s*(.+)$/.exec(userText))) {
     return [text('我来建这个群。'), tool('create_group', { name: order[1], members: order[2].split(/[,，、\s]+/).filter(Boolean) })]

@@ -39,6 +39,8 @@ DeepSeek Bot（简称 DS Bot）是一个基于 [DeepSeek Harness](https://github
 
 连不上 npm 时，第 2 步也可以填 [Releases](https://github.com/Fei2411/DeepSeek-Bot/releases) 里下载的 `ds-bot-0.2.1.tgz` 的完整路径，或者 `github:Fei2411/DeepSeek-Bot#v0.2.1&path:/ds-bot`（需要装 Git）。
 
+DS Bot 0.2.1 及更早的版本在 DSH Desktop 0.2.1-rc.2 及以后的版本里不能自己更新：在插件页移除 `ds-bot`，再添加 `ds-bot`。Bot、聊天和记忆都会保留。
+
 **dsh Web（Windows、macOS、Linux）**
 
 需要 Node.js `22.19` 以上和 pnpm。
@@ -89,6 +91,12 @@ ds bot 拥有群聊功能。群聊是非常好的多 bot 协作方式，但它�
 ### 能力
 
 设置 → **能力** 是团队共享的 MCP 服务、技能和能力包列表。在 Bot 设置中启用能力后，从该 Bot 下一条消息开始生效，也适用于它参与的群聊。Bot 添加的本地 MCP 命令需要你先批准才能运行。有其他 Bot 在用的能力，只有你或主 Bot 能修改、删除。
+
+### 套利研究与模拟
+
+对 Chief 说：**「建立一个套利研究团队，只做研究与模拟。」** 它可以调用 `setup_arbitrage_team`，创建 **Arb Scout**、**Arb Analyst**、**Arb Reviewer** 和 **Arbitrage Lab** 群。三个成员通过现有 Bot 对话分别收集证据、分析场景和复核风险。
+
+`evaluate_arbitrage` 校验提供的同链现货报价和显式成本，保存模拟结果与淘汰原因；`list_arbitrage_records` 查看最近 200 条记录。这一工作流结合 [onchain-arbitrage-colearn](https://github.com/gpteth/onchain-arbitrage-colearn) 的研究方向，代码为原创实现。详见[使用方法与计算范围](ds-bot/README.md#arbitrage-research-and-simulation)。
 
 ### 用量
 
