@@ -13,7 +13,7 @@ English | [中文](README.zh.md)
 
 DeepSeek Bot (DS Bot) is a bot plugin for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH). It turns DSH into bots. You create your own bots, then talk and work with them.
 
-![Say one sentence to Chief, and it sets up the bots and the group chat](docs/images/team.png)
+![Say “Set up an arbitrage research team for research and simulation” to Chief, and it sets up the research bots and the group chat](docs/images/team.png)
 
 ## Install
 
@@ -86,7 +86,7 @@ Any bot can hand work to another bot with @. That bot does the work on its own, 
 
 A group chat has its own memory. What you tell the group stays in the group: its members use it there, and your other chats and the bots outside the group do not see it. You can manage it in the group's details.
 
-![Group chat: the admin, Chief, hands the work to Writer and Coder](docs/images/group.png)
+![Group chat: Chief hands the research to Arb Scout, Arb Analyst, and Arb Reviewer](docs/images/group.png)
 
 ### Capabilities
 

@@ -13,7 +13,7 @@
 
 DeepSeek Bot（简称 DS Bot）是一个基于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)（简称 dsh）的 bot 插件，插件将 dsh 改造为 bot 形式。你可以与自己创建的 bot 交流、工作。
 
-![和 Chief 说一句话，它就把 bot 和群聊建好](docs/images/team.zh.png)
+![对 Chief 说「建立一个套利研究团队，只做研究与模拟」，它就把研究 Bot 和群聊建好](docs/images/team.zh.png)
 
 ## 安装
 
@@ -86,7 +86,7 @@ ds bot 拥有群聊功能。群聊是非常好的多 bot 协作方式，但它�
 
 群聊有自己的记忆。你在群里交代的事留在群里：群成员在这个群里会用到，你的其他对话和群外的 bot 都看不到。你可以在群聊详情里管理它。
 
-![群聊：管理员 Chief 把活派给写手和程序员](docs/images/group.zh.png)
+![群聊：管理员 Chief 把研究派给 Arb Scout、Arb Analyst 和 Arb Reviewer](docs/images/group.zh.png)
 
 ### 能力
 
