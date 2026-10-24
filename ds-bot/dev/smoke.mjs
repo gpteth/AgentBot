@@ -446,6 +446,27 @@ await step('detached capabilities disappear from Chief', () => send(chief().id, 
   return expect(report?.endsWith(seesNothing), `Chief reported ${report}`)
 })
 
+await step('Chief sets up the arbitrage research team', () => send(chief().id, '套利团队'), () => {
+  const team = state().arbitrage?.team
+  const room = state().rooms[team?.roomId]
+  return expect(Object.keys(team?.bots ?? {}).length === 3 && room?.members.length === 4 && room?.admin === chief().id, 'research team or admin-led group is missing')
+})
+await step('repeated arbitrage setup reuses the specialists', () => send(chief().id, '套利团队'), () => {
+  const specialists = Object.values(state().bots).filter(bot => ['Arb Scout', 'Arb Analyst', 'Arb Reviewer'].includes(bot.name))
+  return expect(specialists.length === 3, 'setup duplicated specialists')
+})
+await step('a synthetic arbitrage evaluation is saved', () => send(chief().id, '套利模拟'), () => {
+  const record = state().arbitrage?.records?.at(-1)
+  return expect(record?.result.status === 'paper-candidate' && record.result.netProfitQuote === 3.485 && record.result.dataKind === 'synthetic', 'the synthetic calculation or journal entry is wrong')
+})
+await step('costs can reject a visible spread', () => send(chief().id, '套利模拟 拒绝'), () => {
+  const result = state().arbitrage?.records?.at(-1)?.result
+  return expect(result?.status === 'rejected' && result.reasons.includes('below-minimum-profit'), 'the costly scenario was not rejected')
+})
+await step('the simulation journal is available through a Bot tool', () => send(chief().id, '套利记录'), (_value, calls) => {
+  return expect(calls.some(call => (call.out ?? []).some(block => block.type === 'tool_use' && block.name === 'list_arbitrage_records')), 'the journal tool was not called')
+})
+
 if (outFile) writeFileSync(outFile, `${JSON.stringify(transcript, null, 2)}\n`)
 console.log(failures.length === 0 ? `\nsmoke: all ${transcript.length} steps passed` : `\nsmoke: ${failures.length} failed\n${failures.join('\n')}`)
 process.exit(failures.length === 0 ? 0 : 1)

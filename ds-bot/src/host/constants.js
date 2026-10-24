@@ -68,6 +68,7 @@ export const TEAM_TOOLS = [
   'read_group_chat', 'remember', 'forget', 'recall', 'read_browser',
   'list_capabilities', 'save_capability', 'delete_capability',
   'attach_capability', 'detach_capability',
+  'setup_arbitrage_team', 'evaluate_arbitrage', 'list_arbitrage_records',
 ]
 // A member still at work this long after its first tool call lets the round go on; it
 // posts its reply when the work is done.

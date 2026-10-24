@@ -89,6 +89,49 @@ Model providers are set up with dsh's `llm-pi-ai` plugin in `cordis.patch.yml`. 
 - To send images, the provider needs `defaultInput: [ text, image ]`.
 - Keep API keys out of the repository. Use dsh's own key storage or environment variables.
 
+## Arbitrage research and simulation
+
+Ask a Main Bot: **"Set up an arbitrage research team for research and simulation."** The `setup_arbitrage_team` tool creates three ordinary Bots and an **Arbitrage Lab** group led by that Main Bot. Nothing is created at plugin startup. Repeating setup reuses the saved Bot IDs and keeps renamed Bots and custom instructions. Conflicting existing Bot or group names are refused before creation. A failed setup can be retried to finish the remaining members.
+
+| Member | Responsibility |
+|---|---|
+| Arb Scout | Public source references, token identities, quote units, times, and depth |
+| Arb Analyst | A falsifiable hypothesis and a reproducible cost calculation |
+| Arb Reviewer | Independent evidence review, exposure risks, and reasons to reject |
+
+In the group, ask for one exact asset pair on one chain, a fixed size, and one hypothesis. The admin uses the existing `@` relay to bring in the specialists. Missing quotes or costs must be collected or requested before a calculation. The reference repository [onchain-arbitrage-colearn](https://github.com/gpteth/onchain-arbitrage-colearn) informs the research scope; no external code or notes are bundled or executed.
+
+### Calculation
+
+`evaluate_arbitrage` accepts `chain`, `baseAsset`, `quoteAsset`, `baseAmount`, `dataKind` (`synthetic` or `observed`), `buy`, `sell`, `costs`, and optional `policy`. Each quote needs a distinct `venue`, a `price` in quote units per base unit, `depthBase`, an ISO UTC `observedAt`, and a public HTTP(S) `source`. Both venues must refer to the same chain and exact tokens; include token addresses when available.
+
+Prices must be fee-exclusive averages for the full base amount, including size-dependent price impact. If a provider already includes fees, normalize its quote before using the calculator. All seven cost fields are mandatory, including explicit zero values:
+
+| Cost | Basis |
+|---|---|
+| `buyFeeBps`, `sellFeeBps` | Each leg's respective notional |
+| `buySlippageBps`, `sellSlippageBps` | Budget for further adverse price movement on each leg; do not count quoted price impact twice |
+| `gasQuote`, `otherQuote` | Total costs for the whole scenario, converted to the exact quote asset |
+| `bufferBps` | Extra margin based on buy notional |
+
+One basis point is 0.01%. Gross profit is `baseAmount × (sell.price − buy.price)`. Net simulated profit subtracts every fee, slippage budget, fixed cost, and buffer. `netBps` uses buy notional as its denominator. Amounts are quote-asset units, which are not necessarily dollars. Costs charged in another asset must first be converted into the quote asset.
+
+Defaults: quotes at most 30 seconds old, timestamps at most 5 seconds apart, and net profit at least 1 quote-asset unit and greater than zero. `policy` can change these limits; maximum quote age cannot exceed 300 seconds. Future quotes, stale quotes, unsynchronized quotes, shallow depth on either leg, and insufficient net profit produce a `rejected` result with reasons. Otherwise the result is `paper-candidate`, still a simulation based on unverified caller-supplied data.
+
+### Records and a local demo
+
+Each successful calculation, including a rejected scenario, saves its source URLs, quote times, assumptions, cost breakdown, result, originating Bot, and Session. `list_arbitrage_records` reads the shared journal newest first (`limit`: 1–50, default 10); pass its `nextBefore` as `before` to read older pages, until `nextBefore` is null. The latest 200 records live in the team's `state.json`; earlier records are discarded. Invalid input is refused without a journal entry. Synthetic examples are marked separately from caller-observed data. Records survive restart and are simulation decisions, not fills or realized P&L.
+
+From a source checkout, run a synthetic example without DSH or model credentials:
+
+```sh
+npm run arbitrage:demo
+```
+
+The example prints gross profit `6`, costs `2.515`, and simulated net profit `3.485` DEMO-QUOTE. It prints the calculation only; plugin tool calls save journal entries.
+
+The calculator supports two-venue spot comparisons on one chain. Funding, liquidation, cross-chain transfers, flash loans, MEV execution, fee-on-transfer and rebasing tokens, partial fills, and inventory rebalancing require additional models. There is no market-data adapter, independent source verification, position tracking, wallet connection, signing, or order submission in this module. The Bots still use ordinary DSH tools under the user's existing permissions; their research instructions do not create a separate permission boundary.
+
 ## Memory
 
 A Bot remembers what should last beyond one conversation: your preferences, decisions, corrections and facts it should not ask again. Memory is plain Markdown in the [Agent Memory Repo](https://github.com/AgentMemoryRepo/agentmemoryrepo) format: one entry per line, ending in `[source: …; added: …]`.

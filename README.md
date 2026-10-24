@@ -92,6 +92,12 @@ A group chat has its own memory. What you tell the group stays in the group: its
 
 Settings → **Capabilities** is a shared library of MCP servers, skills and packs. Add a capability to a Bot in its settings; it is available from that Bot's next message in its own chat and group chats. A local MCP command that a Bot adds needs your approval before it can run. While other Bots use a capability, only you or a Main Bot can change or delete it.
 
+### Arbitrage research and simulation
+
+Ask Chief: **"Set up an arbitrage research team for research and simulation."** It can call `setup_arbitrage_team` to create **Arb Scout**, **Arb Analyst**, **Arb Reviewer**, and the **Arbitrage Lab** group. The specialists collect evidence, analyze scenarios, and review risks through the existing Bot conversations.
+
+`evaluate_arbitrage` checks supplied same-chain spot quotes and explicit costs, then saves the simulated result and rejection reasons. `list_arbitrage_records` reads the latest 200 records. This workflow draws on the research topics in [onchain-arbitrage-colearn](https://github.com/gpteth/onchain-arbitrage-colearn); its implementation is original. See [the workflow and calculation limits](ds-bot/README.md#arbitrage-research-and-simulation).
+
 ### Usage
 
 In **Settings** → **Usage**, you can see token usage by time, by bot and by model.

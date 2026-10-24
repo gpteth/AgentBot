@@ -92,6 +92,12 @@ ds bot 拥有群聊功能。群聊是非常好的多 bot 协作方式，但它�
 
 设置 → **能力** 是团队共享的 MCP 服务、技能和能力包列表。在 Bot 设置中启用能力后，从该 Bot 下一条消息开始生效，也适用于它参与的群聊。Bot 添加的本地 MCP 命令需要你先批准才能运行。有其他 Bot 在用的能力，只有你或主 Bot 能修改、删除。
 
+### 套利研究与模拟
+
+对 Chief 说：**「建立一个套利研究团队，只做研究与模拟。」** 它可以调用 `setup_arbitrage_team`，创建 **Arb Scout**、**Arb Analyst**、**Arb Reviewer** 和 **Arbitrage Lab** 群。三个成员通过现有 Bot 对话分别收集证据、分析场景和复核风险。
+
+`evaluate_arbitrage` 校验提供的同链现货报价和显式成本，保存模拟结果与淘汰原因；`list_arbitrage_records` 查看最近 200 条记录。这一工作流结合 [onchain-arbitrage-colearn](https://github.com/gpteth/onchain-arbitrage-colearn) 的研究方向，代码为原创实现。详见[使用方法与计算范围](ds-bot/README.md#arbitrage-research-and-simulation)。
+
 ### 用量
 
 在 设置 → 用量 里，可以按时间、按 bot、按模型查看 Token 用量。
